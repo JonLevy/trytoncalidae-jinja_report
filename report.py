@@ -9,6 +9,7 @@ import jinja2
 
 from trytond.pool import Pool, PoolMeta
 from trytond.report.report import TranslateFactory
+from trytond import __version__
 
 
 class JinjaExtensionsMixin():
@@ -57,10 +58,16 @@ class Jinja2Report(JinjaExtensionsMixin, metaclass=PoolMeta):
 
     @classmethod
     def get_translations(cls):
-        translate = TranslateFactory(
-            cls.__name__,
-            Pool().get('ir.translation'),
-        )
+        if __version__.startswith('5'):
+            translate = TranslateFactory(
+                cls.__name__, 'en',
+                Pool().get('ir.translation'),
+            )
+        else:
+            translate = TranslateFactory(
+                cls.__name__,
+                Pool().get('ir.translation'),
+            )
         return JinjaTranslator(lambda text: translate(text))
 
     @classmethod
